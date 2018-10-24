@@ -1,4 +1,4 @@
-ERROR_EDGE="electrumX can currently be installed only on the edge Version of Alpine Linux"
+ERROR_EDGE="electrumX-civx can currently be installed only on the edge Version of Alpine Linux"
 grep -q -F "/edge/main" /etc/apk/repositories > /dev/null || _error "${ERROR_EDGE}"
 grep -q -F "/edge/community" /etc/apk/repositories > /dev/null || _error "${ERROR_EDGE}"
 
@@ -10,12 +10,12 @@ function install_script_dependencies {
 	REPO="http://dl-cdn.alpinelinux.org/alpine/edge/testing"
 	grep -q -F "${REPO}" /etc/apk/repositories || echo "${REPO}" >> /etc/apk/repositories
 	apk update
-	$APK add --virtual electrumX-dep openssl wget gcc g++
+	$APK add --virtual electrumX-civx-dep openssl wget gcc g++
 }
 
 function add_user {
-	adduser -D electrumx
-	id -u electrumx || _error "Could not add user account" 1
+	adduser -D electrumx-civx
+	id -u electrumx-civx || _error "Could not add user account" 1
 }
 
 function install_python37 {
@@ -23,7 +23,7 @@ function install_python37 {
 }
 
 function install_git {
-	$APK add --virtual electrumX-git git
+	$APK add --virtual electrumX-civx-git git
 }
 
 function install_compiler {
@@ -32,7 +32,7 @@ function install_compiler {
 
 function install_rocksdb {
 	$APK add rocksdb
-	$APK add --virtual electrumX-db rocksdb-dev
+	$APK add --virtual electrumX-civx-db rocksdb-dev
 }
 
 function install_leveldb {
@@ -50,8 +50,8 @@ function generate_cert {
 		return
 	fi
 	_DIR=$(pwd)
-	mkdir -p /etc/electrumx/
-	cd /etc/electrumx
+	mkdir -p /etc/electrumx-civx/
+	cd /etc/electrumx-civx
 	# openssl default configuration is incomplet under alpine.
 	# Hence adding this configruation from archlinux to allow certificat creation
 	# https://www.archlinux.org/packages/core/x86_64/openssl/
@@ -68,16 +68,16 @@ stateOrProvinceName_default	= Some-State
 	openssl req -new -key server.key -batch -out server.csr
 	openssl x509 -req -days 1825 -in server.csr -signkey server.key -out server.crt
 	rm server.csr
-	chown electrumx:electrumx /etc/electrumx -R
-	chmod 600 /etc/electrumx/server*
+	chown electrumx-civx:electrumx-civx /etc/electrumx-civx -R
+	chmod 600 /etc/electrumx-civx/server*
 	cd $_DIR
-	echo -e "\nSSL_CERTFILE=/etc/electrumx/server.crt" >> /etc/electrumx.conf
-	echo "SSL_KEYFILE=/etc/electrumx/server.key" >> /etc/electrumx.conf
-	echo "TCP_PORT=50001" >> /etc/electrumx.conf
-	echo "SSL_PORT=50002" >> /etc/electrumx.conf
-	echo -e "# Listen on all interfaces:\nHOST=" >> /etc/electrumx.conf
+	echo -e "\nSSL_CERTFILE=/etc/electrumx-civx/server.crt" >> /etc/electrumx-civx.conf
+	echo "SSL_KEYFILE=/etc/electrumx-civx/server.key" >> /etc/electrumx-civx.conf
+	echo "TCP_PORT=50001" >> /etc/electrumx-civx.conf
+	echo "SSL_PORT=50002" >> /etc/electrumx-civx.conf
+	echo -e "# Listen on all interfaces:\nHOST=" >> /etc/electrumx-civx.conf
 }
 
 function package_cleanup {
-	$APK del electrumX-dep electrumX-python electrumX-git electrumX-db
+	$APK del electrumX-civx-dep electrumX-civx-python electrumX-civx-git electrumX-civx-db
 }

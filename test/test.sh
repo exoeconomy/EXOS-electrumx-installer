@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd /tmp/electrumx-installer/electrumx-installer
+cd /tmp/electrumx-civx-installer/electrumx-civx-installer
 
 if [ -e "./test/preinstall/$IMAGE" ]; then
     "./test/preinstall/$IMAGE"

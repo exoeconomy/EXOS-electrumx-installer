@@ -5,11 +5,11 @@ YELLOW='\033[1;33m'
 BLUE='\033[0,34m'
 NC='\033[0m' # No Color
 
-DB_DIR="/db"
+DB_DIR="/db-civx"
 UPDATE_ONLY=0
 UPDATE_PYTHON=0
 VERBOSE=0
-USE_ROCKSDB=1
+USE_ROCKSDB=0
 ELECTRUMX_GIT_URL="https://github.com/kyuupichan/electrumx"
 ELECTRUMX_GIT_BRANCH=""
 
@@ -34,16 +34,16 @@ while [[ $# -gt 0 ]]; do
 		cat >&2 <<HELP
 Usage: install.sh [OPTIONS]
 
-Install electrumx.
+Install electrumx-civx.
 
- -h --help                     Show this help
- -v --verbose				   Enable verbose logging
- -d --dbdir dir                Set database directory (default: /db/)
- --update                      Update previously installed version
- --update-python			   Install Python 3.7 and use with electrumx (doesn't remove system installation of Python 3)
- --leveldb                     Use LevelDB instead of RocksDB
---electrumx-git-url url        Install ElectrumX from this URL instead
---electrumx-git-branch branch  Install specific branch of ElectrumX repository
+ -h --help                     		Show this help
+ -v --verbose				   		Enable verbose logging
+ -d --dbdir dir                		Set database directory (default: /db/)
+ --update                      		Update previously installed version
+ --update-python			   		Install Python 3.7 and use with electrumx (doesn't remove system installation of Python 3)
+ --leveldb                     		Use LevelDB instead of RocksDB
+--electrumx-civx-git-url url        Install ElectrumX-civx from this URL instead
+--electrumx-civx-git-branch branch  Install specific branch of ElectrumX-civx repository
 HELP
 		exit 0
 		;;
@@ -63,11 +63,11 @@ HELP
 	    --leveldb)
 	    USE_ROCKSDB=0
 	    ;;
-		--electrumx-git-url)
+		--electrumx-civx-git-url)
 		ELECTRUMX_GIT_URL="$2"
 		shift
 		;;
-		--electrumx-git-branch)
+		--electrumx-civx-git-branch)
 		ELECTRUMX_GIT_BRANCH="$2"
 		shift
 		;;
@@ -80,18 +80,18 @@ HELP
 done
 
 # redirect child output
-echo "" > /tmp/electrumx-installer-$$.log
-exec 3>&1 4>&2 2>/tmp/electrumx-installer-$$.log >&2
+echo "" > /tmp/electrumx-civx-installer-$$.log
+exec 3>&1 4>&2 2>/tmp/electrumx-civx-installer-$$.log >&2
 
 if [ $VERBOSE == 1 ]; then
-	tail -f /tmp/electrumx-installer-$$.log >&4 &
+	tail -f /tmp/electrumx-civx-installer-$$.log >&4 &
 fi
 
 
 function _error {
-        if [ -s /tmp/electrumx-installer-$$.log ]; then
+        if [ -s /tmp/electrumx-civx-installer-$$.log ]; then
 	  echo -en "\n---- LOG OUTPUT BELOW ----\n" >&4
-	  tail -n 50 /tmp/electrumx-installer-$$.log >&4
+	  tail -n 50 /tmp/electrumx-civx-installer-$$.log >&4
 	  echo -en "\n---- LOG OUTPUT ABOVE ----\n" >&4
         fi
 	printf "\r${RED}ERROR:${NC}   ${1}\n" >&4
@@ -157,11 +157,11 @@ done
 
 if [ $UPDATE_ONLY == 0 ] || [ $UPDATE_PYTHON == 1 ]; then
 	if which electrumx_server > /dev/null 2>&1 && [ $UPDATE_PYTHON == 0 ]; then
-		_error "electrumx is already installed. Use $0 --update to... update." 9
+		_error "electrumx-civx is already installed. Use $0 --update to... update." 9
 	fi
 	_status "Installing installer dependencies"
 	install_script_dependencies
-	_status "Adding new user for electrumx"
+	_status "Adding new user for electrumx-civx"
 	add_user
 	_status "Creating database directory in $DB_DIR"
 	create_db_dir $DB_DIR
@@ -224,7 +224,7 @@ if [ $UPDATE_ONLY == 0 ] || [ $UPDATE_PYTHON == 1 ]; then
 		install_leveldb
 	fi
 
-	_status "Installing electrumx"
+	_status "Installing electrumx-civx"
 	install_electrumx
 
 	if [ $UPDATE_PYTHON == 0 ]; then
@@ -241,22 +241,22 @@ if [ $UPDATE_ONLY == 0 ] || [ $UPDATE_PYTHON == 1 ]; then
 		_status "Cleaning up"
 		package_cleanup	
 	fi
-	_info "electrumx has been installed successfully. Edit /etc/electrumx.conf to configure it."
+	_info "electrumx-civx has been installed successfully. Edit /etc/electrumx-civx.conf to configure it."
 else
-	_info "Updating electrumx"
+	_info "Updating electrumx-civx"
 	i=0
-	while $python -m pip show electrumx; do
-	    $python -m pip uninstall -y electrumx || true
+	while $python -m pip show electrumx-civx; do
+	    $python -m pip uninstall -y electrumx-civx || true
 	    ((i++))
 	    if "$i" -gt 5; then
 	        break
 	    fi
 	done
-	if grep '/usr/local/bin/electrumx_server.py' /etc/systemd/system/electrumx.service; then
+	if grep '/usr/local/bin/electrumx_server.py' /etc/systemd/system/electrumx-civx.service; then
 	    _info "Updating pre-1.5 systemd configuration to new binary names"
-		sed -i -- 's/_server.py/_server/g' /etc/systemd/system/electrumx.service
+		sed -i -- 's/_server.py/_server/g' /etc/systemd/system/electrumx-civx.service
 		systemctl daemon-reload
 	fi
 	install_electrumx
-        _info "Installed $($python -m pip freeze | grep -i electrumx)"
+        _info "Installed $($python -m pip freeze | grep -i electrumx-civx)"
 fi

@@ -1,7 +1,7 @@
 # Contains functions that should work on all POSIX-compliant systems
 function create_db_dir {
 	mkdir -p $1
-	chown electrumx:electrumx $1
+	chown electrumx-civx:electrumx-civx $1
 }
 
 function check_pyrocksdb {
@@ -10,9 +10,9 @@ function check_pyrocksdb {
 
 function install_electrumx {
 	_DIR=$(pwd)
-	rm -rf "/tmp/electrumx/"
-	git clone $ELECTRUMX_GIT_URL /tmp/electrumx
-	cd /tmp/electrumx
+	rm -rf "/tmp/electrumx-civx/"
+	git clone $ELECTRUMX_GIT_URL /tmp/electrumx-civx
+	cd /tmp/electrumx-civx
 	if [ -z "$ELECTRUMX_GIT_BRANCH" ]; then
 		git checkout $ELECTRUMX_GIT_BRANCH
 	else
@@ -28,7 +28,7 @@ function install_electrumx {
 	fi
 	$python -m pip install . --upgrade > /dev/null 2>&1
 	if ! $python -m pip install . --upgrade; then
-		_error "Unable to install electrumx" 7
+		_error "Unable to install electrumx-civx" 7
 	fi
 	cd $_DIR
 }
@@ -55,8 +55,8 @@ function install_python_rocksdb {
 }
 
 function add_user {
-	useradd electrumx
-	id -u electrumx || _error "Could not add user account" 1
+	useradd electrumx-civx
+	id -u electrumx-civx || _error "Could not add user account" 1
 }
 
 function generate_cert {
@@ -65,22 +65,22 @@ function generate_cert {
 		return
 	fi
 	_DIR=$(pwd)
-	mkdir -p /etc/electrumx/
-	cd /etc/electrumx
+	mkdir -p /etc/electrumx-civx/
+	cd /etc/electrumx-civx
 	openssl genrsa -des3 -passout pass:xxxx -out server.pass.key 2048
 	openssl rsa -passin pass:xxxx -in server.pass.key -out server.key
 	rm server.pass.key
 	openssl req -new -key server.key -batch -out server.csr
 	openssl x509 -req -days 1825 -in server.csr -signkey server.key -out server.crt
 	rm server.csr
-	chown electrumx:electrumx /etc/electrumx -R
-	chmod 600 /etc/electrumx/server*
+	chown electrumx-civx:electrumx-civx /etc/electrumx-civx -R
+	chmod 600 /etc/electrumx-civx/server*
 	cd $_DIR
-	echo -e "\nSSL_CERTFILE=/etc/electrumx/server.crt" >> /etc/electrumx.conf
-	echo "SSL_KEYFILE=/etc/electrumx/server.key" >> /etc/electrumx.conf
-        echo "TCP_PORT=50001" >> /etc/electrumx.conf
-        echo "SSL_PORT=50002" >> /etc/electrumx.conf
-        echo -e "# Listen on all interfaces:\nHOST=" >> /etc/electrumx.conf
+	echo -e "\nSSL_CERTFILE=/etc/electrumx-civx/server.crt" >> /etc/electrumx-civx.conf
+	echo "SSL_KEYFILE=/etc/electrumx-civx/server.key" >> /etc/electrumx-civx.conf
+        echo "TCP_PORT=50001" >> /etc/electrumx-civx.conf
+        echo "SSL_PORT=50002" >> /etc/electrumx-civx.conf
+        echo -e "# Listen on all interfaces:\nHOST=" >> /etc/electrumx-civx.conf
 }
 
 function ver { printf "%03d%03d%03d%03d" $(echo "$1" | tr '.' ' '); }
