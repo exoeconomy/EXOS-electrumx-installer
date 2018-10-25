@@ -36,14 +36,14 @@ Usage: install.sh [OPTIONS]
 
 Install electrumx-civx.
 
- -h --help                     		Show this help
- -v --verbose				   		Enable verbose logging
- -d --dbdir dir                		Set database directory (default: /db/)
- --update                      		Update previously installed version
- --update-python			   		Install Python 3.7 and use with electrumx (doesn't remove system installation of Python 3)
- --leveldb                     		Use LevelDB instead of RocksDB
---electrumx-civx-git-url url        Install ElectrumX-civx from this URL instead
---electrumx-civx-git-branch branch  Install specific branch of ElectrumX-civx repository
+ -h --help                           Show this help
+ -v --verbose                        Enable verbose logging
+ -d --dbdir dir                      Set database directory (default: /db/)
+ --update                            Update previously installed version
+ --update-python                     Install Python 3.7 and use with electrumx (doesn't remove system installation of Python 3)
+ --leveldb                           Use LevelDB instead of RocksDB
+ --electrumx-civx-git-url url        Install ElectrumX-civx from this URL instead
+ --electrumx-civx-git-branch branch  Install specific branch of ElectrumX-civx repository
 HELP
 		exit 0
 		;;
