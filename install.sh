@@ -5,7 +5,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0,34m'
 NC='\033[0m' # No Color
 
-DB_DIR="/db-civx"
+DB_DIR="/db-exos"
 UPDATE_ONLY=0
 UPDATE_PYTHON=0
 VERBOSE=0
@@ -34,7 +34,7 @@ while [[ $# -gt 0 ]]; do
 		cat >&2 <<HELP
 Usage: install.sh [OPTIONS]
 
-Install electrumx-civx.
+Install exos-electrumx.
 
  -h --help                           Show this help
  -v --verbose                        Enable verbose logging
@@ -42,8 +42,8 @@ Install electrumx-civx.
  --update                            Update previously installed version
  --update-python                     Install Python 3.7 and use with electrumx (doesn't remove system installation of Python 3)
  --leveldb                           Use LevelDB instead of RocksDB
- --electrumx-civx-git-url url        Install ElectrumX-civx from this URL instead
- --electrumx-civx-git-branch branch  Install specific branch of ElectrumX-civx repository
+ --exos-electrumx-git-url url        Install exos-electrumx from this URL instead
+ --exos-electrumx-git-branch branch  Install specific branch of exos-electrumx repository
 HELP
 		exit 0
 		;;
@@ -63,11 +63,11 @@ HELP
 	    --leveldb)
 	    USE_ROCKSDB=0
 	    ;;
-		--electrumx-civx-git-url)
+		--exos-electrumx-git-url)
 		ELECTRUMX_GIT_URL="$2"
 		shift
 		;;
-		--electrumx-civx-git-branch)
+		--exos-electrumx-git-branch)
 		ELECTRUMX_GIT_BRANCH="$2"
 		shift
 		;;
@@ -80,18 +80,18 @@ HELP
 done
 
 # redirect child output
-echo "" > /tmp/electrumx-civx-installer-$$.log
-exec 3>&1 4>&2 2>/tmp/electrumx-civx-installer-$$.log >&2
+echo "" > /tmp/exos-electrumx-installer-$$.log
+exec 3>&1 4>&2 2>/tmp/exos-electrumx-installer-$$.log >&2
 
 if [ $VERBOSE == 1 ]; then
-	tail -f /tmp/electrumx-civx-installer-$$.log >&4 &
+	tail -f /tmp/exos-electrumx-installer-$$.log >&4 &
 fi
 
 
 function _error {
-        if [ -s /tmp/electrumx-civx-installer-$$.log ]; then
+        if [ -s /tmp/exos-electrumx-installer-$$.log ]; then
 	  echo -en "\n---- LOG OUTPUT BELOW ----\n" >&4
-	  tail -n 50 /tmp/electrumx-civx-installer-$$.log >&4
+	  tail -n 50 /tmp/exos-electrumx-installer-$$.log >&4
 	  echo -en "\n---- LOG OUTPUT ABOVE ----\n" >&4
         fi
 	printf "\r${RED}ERROR:${NC}   ${1}\n" >&4
@@ -157,11 +157,11 @@ done
 
 if [ $UPDATE_ONLY == 0 ] || [ $UPDATE_PYTHON == 1 ]; then
 	if which electrumx_server > /dev/null 2>&1 && [ $UPDATE_PYTHON == 0 ]; then
-		_error "electrumx-civx is already installed. Use $0 --update to... update." 9
+		_error "exos-electrumx is already installed. Use $0 --update to... update." 9
 	fi
 	_status "Installing installer dependencies"
 	install_script_dependencies
-	_status "Adding new user for electrumx-civx"
+	_status "Adding new user for exos-electrumx"
 	add_user
 	_status "Creating database directory in $DB_DIR"
 	create_db_dir $DB_DIR
@@ -224,7 +224,7 @@ if [ $UPDATE_ONLY == 0 ] || [ $UPDATE_PYTHON == 1 ]; then
 		install_leveldb
 	fi
 
-	_status "Installing electrumx-civx"
+	_status "Installing exos-electrumx"
 	install_electrumx
 
 	if [ $UPDATE_PYTHON == 0 ]; then
@@ -241,22 +241,22 @@ if [ $UPDATE_ONLY == 0 ] || [ $UPDATE_PYTHON == 1 ]; then
 		_status "Cleaning up"
 		package_cleanup	
 	fi
-	_info "electrumx-civx has been installed successfully. Edit /etc/electrumx-civx.conf to configure it."
+	_info "exos-electrumx has been installed successfully. Edit /etc/exos-electrumx.conf to configure it."
 else
-	_info "Updating electrumx-civx"
+	_info "Updating exos-electrumx"
 	i=0
-	while $python -m pip show electrumx-civx; do
-	    $python -m pip uninstall -y electrumx-civx || true
+	while $python -m pip show exos-electrumx; do
+	    $python -m pip uninstall -y exos-electrumx || true
 	    ((i++))
 	    if "$i" -gt 5; then
 	        break
 	    fi
 	done
-	if grep '/usr/local/bin/electrumx_server.py' /etc/systemd/system/electrumx-civx.service; then
+	if grep '/usr/local/bin/electrumx_server.py' /etc/systemd/system/exos-electrumx.service; then
 	    _info "Updating pre-1.5 systemd configuration to new binary names"
-		sed -i -- 's/_server.py/_server/g' /etc/systemd/system/electrumx-civx.service
+		sed -i -- 's/_server.py/_server/g' /etc/systemd/system/exos-electrumx.service
 		systemctl daemon-reload
 	fi
 	install_electrumx
-        _info "Installed $($python -m pip freeze | grep -i electrumx-civx)"
+        _info "Installed $($python -m pip freeze | grep -i exos-electrumx)"
 fi

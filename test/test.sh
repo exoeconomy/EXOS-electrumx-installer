@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd /tmp/electrumx-civx-installer/electrumx-civx-installer
+cd /tmp/exos-electrumx-installer/exos-electrumx-installer
 
 if [ -e "./test/preinstall/$IMAGE" ]; then
     "./test/preinstall/$IMAGE"
